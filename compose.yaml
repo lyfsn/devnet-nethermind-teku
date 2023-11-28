@@ -76,7 +76,7 @@ services:
       - "11400:11100/udp"
       - "11400:11100/tcp" 
       - "4600:4000"
-      - "7454:8008"
+      - "7554:8008"
     depends_on:
       - execution
     restart: unless-stopped
