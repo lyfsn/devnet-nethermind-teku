@@ -1,0 +1,82 @@
+version: "3.8"
+
+services:
+  execution:
+    image: nethermind/nethermind:latest
+    command:
+      - --log=INFO
+      - --datadir=/execution-data
+      - --Init.ChainSpecPath=/el-cl-genesis-data/custom_config_data/chainspec.json
+      - --Init.WebSocketsEnabled=true
+      - --Init.KzgSetupPath=/el-cl-genesis-data/custom_config_data/trusted_setup.txt
+      - --config=none.cfg
+      - --JsonRpc.Enabled=true
+      - --JsonRpc.EnabledModules=net,eth,consensus,subscribe,web3,admin
+      - --JsonRpc.Host=0.0.0.0
+      - --JsonRpc.Port=8545
+      - --JsonRpc.WebSocketsPort=8546
+      - --JsonRpc.EngineHost=0.0.0.0
+      - --JsonRpc.EnginePort=8551
+      - --Network.ExternalIp=${IP_ADDRESS}
+      - --Network.DiscoveryPort=50403
+      - --Network.P2PPort=50403
+      - --JsonRpc.JwtSecretFile=/el-cl-genesis-data/jwt/jwtsecret
+      - --Network.OnlyStaticPeers=true
+      - --Metrics.Enabled=true
+      - --Metrics.ExposePort=9001
+      - --Network.StaticPeers=enode://30674d1f5fa3cf763c2d991eeaf585db42c45737a4d47aee3653b50ac33947437769e13f04c12bab63d5c2a416d08b2637e6340d13b7d59489f0ac8dae919756@88.99.94.109:50303
+    volumes:
+      - ./execution-data:/execution-data
+      - ./el-cl-genesis-data:/el-cl-genesis-data
+    ports:
+      - "10945:8545" 
+      - "10946:8546" 
+      - "10951:8551" 
+      - "11401:9001" 
+      - "50703:50403"
+    restart: unless-stopped
+
+  beacon:
+    image: consensys/teku:latest
+    user: "root"
+    command:
+      - --logging=INFO 
+      - --log-destination=CONSOLE 
+      - --network=/el-cl-genesis-data/custom_config_data/config.yaml 
+      - --initial-state=/el-cl-genesis-data/custom_config_data/genesis.ssz 
+      - --data-path=/opt/teku/consensus-data 
+      - --data-storage-mode=ARCHIVE 
+      - --p2p-enabled=true 
+      - --p2p-subscribe-all-subnets-enabled=true 
+      - --p2p-peer-lower-bound=1 
+      - --p2p-advertised-ip=${IP_ADDRESS}
+      - --p2p-discovery-site-local-addresses-enabled 
+      - --rest-api-enabled=true 
+      - --rest-api-docs-enabled=true 
+      - --rest-api-interface=0.0.0.0 
+      - --rest-api-port=4000 
+      - --rest-api-host-allowlist=* 
+      - --data-storage-non-canonical-blocks-enabled=true 
+      - --ee-jwt-secret-file=/el-cl-genesis-data/jwt/jwtsecret 
+      - --ee-endpoint=http://execution:8551 
+      - --metrics-enabled 
+      - --metrics-interface=0.0.0.0 
+      - --metrics-host-allowlist='*' 
+      - --metrics-categories=BEACON,PROCESS,LIBP2P,JVM,NETWORK,PROCESS 
+      - --metrics-port=8008 
+      - --Xtrusted-setup=/el-cl-genesis-data/custom_config_data/trusted_setup.txt 
+      - --validator-keys=/validator-keys/node-3-keystores/teku-keys:/validator-keys/node-3-keystores/teku-secrets 
+      - --validators-proposer-default-fee-recipient=0x8943545177806ED17B9F23F0a21ee5948eCaa776 
+      - --p2p-discovery-bootnodes=enr:-MS4QKjvQWjHjNSlrgJBnwI7j88ULp36kH6FegWreBuiHL0_UGs4EvAxALKLgvKjTFpk6x0zTPyxoXXt0PDeZxlAihgBh2F0dG5ldHOIAAAAAAAAAACEZXRoMpAjvkwgQAAAOP__________gmlkgnY0gmlwhFhjXm2EcXVpY4Iq-YlzZWNwMjU2azGhAoNhfDA57peBhfKlgRRDYKmjwOUPSPqj97hpWmwycgJdiHN5bmNuZXRzAIN0Y3CCKviDdWRwgir4
+      - --p2p-static-peers=/ip4/88.99.94.109/tcp/11000/p2p/16Uiu2HAm4GXc2aYZkdfHvvn56s6zEdoSAwdiNcGkzvXX5y4MX4U4
+    volumes:
+      - ./consensus-data:/consensus-data 
+      - ./el-cl-genesis-data:/el-cl-genesis-data
+    ports:
+      - "11400:11100/udp"
+      - "11400:11100/tcp" 
+      - "4600:4000"
+      - "7454:8008"
+    depends_on:
+      - execution
+    restart: unless-stopped
