@@ -46,11 +46,6 @@ services:
       - --initial-state=/el-cl-genesis-data/custom_config_data/genesis.ssz 
       - --data-path=/opt/teku/consensus-data 
       - --data-storage-mode=ARCHIVE 
-      - --p2p-enabled=true 
-      - --p2p-subscribe-all-subnets-enabled=true 
-      - --p2p-peer-lower-bound=1 
-      - --p2p-advertised-ip=${IP_ADDRESS}
-      - --p2p-discovery-site-local-addresses-enabled 
       - --rest-api-enabled=true 
       - --rest-api-docs-enabled=true 
       - --rest-api-interface=0.0.0.0 
@@ -67,14 +62,20 @@ services:
       - --Xtrusted-setup=/el-cl-genesis-data/custom_config_data/trusted_setup.txt 
       - --validator-keys=/validator-keys/node-3-keystores/teku-keys:/validator-keys/node-3-keystores/teku-secrets 
       - --validators-proposer-default-fee-recipient=0x8943545177806ED17B9F23F0a21ee5948eCaa776 
-      - --p2p-discovery-bootnodes=enr:-MS4QKjvQWjHjNSlrgJBnwI7j88ULp36kH6FegWreBuiHL0_UGs4EvAxALKLgvKjTFpk6x0zTPyxoXXt0PDeZxlAihgBh2F0dG5ldHOIAAAAAAAAAACEZXRoMpAjvkwgQAAAOP__________gmlkgnY0gmlwhFhjXm2EcXVpY4Iq-YlzZWNwMjU2azGhAoNhfDA57peBhfKlgRRDYKmjwOUPSPqj97hpWmwycgJdiHN5bmNuZXRzAIN0Y3CCKviDdWRwgir4
+      - --p2p-discovery-bootnodes=enr:-Ma4QDCZLvwSpUnbRMG5bh2J5H4Dx4FCikjUsPwW4Dmt390TINwdOHcFMPsv2HQOfPmJdmgXdEYJ5vqeEhO8Z_hbBByCBX6HYXR0bmV0c4j__________4RldGgykCO-TCBQAAA4QEIPAAAAAACCaWSCdjSCaXCEWGNebYRxdWljgir5iXNlY3AyNTZrMaECg2F8MDnul4GF8qWBFENgqaPA5Q9I-qP3uGlabDJyAl2Ic3luY25ldHMPg3RjcIIq-IN1ZHCCKvg
       - --p2p-static-peers=/ip4/88.99.94.109/tcp/11000/p2p/16Uiu2HAm4GXc2aYZkdfHvvn56s6zEdoSAwdiNcGkzvXX5y4MX4U4
+      - --p2p-discovery-site-local-addresses-enabled=true
+      - --p2p-enabled=true 
+      - --p2p-subscribe-all-subnets-enabled=true 
+      - --p2p-peer-lower-bound=1 
+      - --p2p-advertised-ip=${IP_ADDRESS}
+      - --p2p-port=11400
     volumes:
       - ./consensus-data:/consensus-data 
       - ./el-cl-genesis-data:/el-cl-genesis-data
     ports:
-      - "11400:11100/udp"
-      - "11400:11100/tcp" 
+      - "11400:11400/udp"
+      - "11400:11400/tcp" 
       - "4600:4000"
       - "7554:8008"
     depends_on:
